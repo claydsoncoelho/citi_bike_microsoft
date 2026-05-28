@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "util_create_lakehouse_spn"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "31977d5e-0870-9fe1-4dd0-b1a7cad6bbc6"
+  }
+}
