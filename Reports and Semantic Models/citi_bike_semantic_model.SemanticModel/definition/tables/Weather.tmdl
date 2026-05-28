@@ -1,0 +1,267 @@
+table Weather
+	lineageTag: 2e37f136-2f83-4dbf-8aa9-6b76b0d75026
+	sourceLineageTag: [dbo].[DIM_WEATHER]
+
+	column SCD_DIM_WEATHER_ID
+		dataType: string
+		sourceProviderType: varchar(255)
+		lineageTag: 019edb17-0a54-4a9e-b488-353e4b97274a
+		sourceLineageTag: SCD_DIM_WEATHER_ID
+		summarizeBy: none
+		sourceColumn: SCD_DIM_WEATHER_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column DATE_READABLE
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: date
+		lineageTag: 15b680f4-f709-4840-ae7a-d44785ff87b6
+		sourceLineageTag: DATE_READABLE
+		summarizeBy: none
+		sourceColumn: DATE_READABLE
+
+		annotation SummarizationSetBy = Automatic
+
+	column TIME_READABLE
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: 6b991c2f-a60e-4c4b-ae96-bd7f4c1d4604
+		sourceLineageTag: TIME_READABLE
+		summarizeBy: none
+		sourceColumn: TIME_READABLE
+
+		annotation SummarizationSetBy = Automatic
+
+	column COUNTRY
+		dataType: string
+		sourceProviderType: varchar(50)
+		lineageTag: 19be04ed-2e0e-4394-bdd9-9fde26ab93ed
+		sourceLineageTag: COUNTRY
+		summarizeBy: none
+		sourceColumn: COUNTRY
+
+		annotation SummarizationSetBy = Automatic
+
+	column CITY_NAME
+		dataType: string
+		sourceProviderType: varchar(255)
+		lineageTag: 53e3855d-35c6-44fa-9bef-44a956946730
+		sourceLineageTag: CITY_NAME
+		summarizeBy: none
+		sourceColumn: CITY_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column WEATHER_MAIN
+		dataType: string
+		sourceProviderType: varchar(100)
+		lineageTag: 4fe20d95-62c6-401b-b741-3314fdcca8cd
+		sourceLineageTag: WEATHER_MAIN
+		summarizeBy: none
+		sourceColumn: WEATHER_MAIN
+
+		annotation SummarizationSetBy = Automatic
+
+	column WEATHER_DETAIL
+		dataType: string
+		sourceProviderType: varchar(255)
+		lineageTag: 48d7a53d-a97e-4bcf-9e4f-8c7e5734b840
+		sourceLineageTag: WEATHER_DETAIL
+		summarizeBy: none
+		sourceColumn: WEATHER_DETAIL
+
+		annotation SummarizationSetBy = Automatic
+
+	column TEMPERATURE_CELSIUS
+		dataType: double
+		sourceProviderType: float
+		lineageTag: e0b30791-e138-43da-96e8-dadb67ed902e
+		sourceLineageTag: TEMPERATURE_CELSIUS
+		summarizeBy: none
+		sourceColumn: TEMPERATURE_CELSIUS
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column HUMIDITY
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 8a7b6dfb-7019-4ae5-802b-4a368850fcd1
+		sourceLineageTag: HUMIDITY
+		summarizeBy: none
+		sourceColumn: HUMIDITY
+
+		annotation SummarizationSetBy = Automatic
+
+	column WIND_SPEED
+		dataType: double
+		sourceProviderType: float
+		lineageTag: ae62c1c2-4690-47eb-b9d1-3a1f794b2e46
+		sourceLineageTag: WIND_SPEED
+		summarizeBy: none
+		sourceColumn: WIND_SPEED
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column CITY_LATITUDE
+		dataType: double
+		sourceProviderType: decimal(9, 6)
+		lineageTag: 7383e364-16d3-4d97-b93b-a24794edc1d1
+		sourceLineageTag: CITY_LATITUDE
+		summarizeBy: none
+		sourceColumn: CITY_LATITUDE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column CITY_LAT_BUCKET
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: d83e868a-4bfd-4c0c-a8ca-78d56ad9ee03
+		sourceLineageTag: CITY_LAT_BUCKET
+		summarizeBy: none
+		sourceColumn: CITY_LAT_BUCKET
+
+		annotation SummarizationSetBy = Automatic
+
+	column CITY_LONGITUDE
+		dataType: double
+		sourceProviderType: decimal(9, 6)
+		lineageTag: eb1bb0ee-0209-41f6-99f0-b32b1a6ec2e8
+		sourceLineageTag: CITY_LONGITUDE
+		summarizeBy: none
+		sourceColumn: CITY_LONGITUDE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column CITY_LON_BUCKET
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: b75bdba3-b56a-4379-bce3-533ae82c44d7
+		sourceLineageTag: CITY_LON_BUCKET
+		summarizeBy: none
+		sourceColumn: CITY_LON_BUCKET
+
+		annotation SummarizationSetBy = Automatic
+
+	column CITY_LOCATION
+		dataType: string
+		sourceProviderType: varchar(255)
+		lineageTag: 165d275a-3fbd-46a4-a1e7-ac72142f1366
+		sourceLineageTag: CITY_LOCATION
+		summarizeBy: none
+		sourceColumn: CITY_LOCATION
+
+		annotation SummarizationSetBy = Automatic
+
+	column TEMPERATURE_KELVIN
+		dataType: double
+		sourceProviderType: float
+		lineageTag: 270850ca-0aa2-435a-897d-098c24e2384d
+		sourceLineageTag: TEMPERATURE_KELVIN
+		summarizeBy: none
+		sourceColumn: TEMPERATURE_KELVIN
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column PRESSURE
+		dataType: double
+		sourceProviderType: float
+		lineageTag: 961ebe9e-28a7-4cb6-b5cd-ecb376500b87
+		sourceLineageTag: PRESSURE
+		summarizeBy: none
+		sourceColumn: PRESSURE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column WIND_DEG
+		dataType: double
+		sourceProviderType: float
+		lineageTag: ffa0bd96-5519-4261-8046-dcf478080005
+		sourceLineageTag: WIND_DEG
+		summarizeBy: none
+		sourceColumn: WIND_DEG
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column CITY_ID
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: b5fc5d7f-b852-4308-a249-ef353d5a7c70
+		sourceLineageTag: CITY_ID
+		summarizeBy: none
+		sourceColumn: CITY_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column CITY_FINDNAME
+		dataType: string
+		sourceProviderType: varchar(255)
+		lineageTag: b716c6f1-cc3f-4404-bc0b-08ec599f8fdd
+		sourceLineageTag: CITY_FINDNAME
+		summarizeBy: none
+		sourceColumn: CITY_FINDNAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column SCD_VALID_FROM
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: 54990a43-cb9f-44df-9a08-b7bdff96203f
+		sourceLineageTag: SCD_VALID_FROM
+		summarizeBy: none
+		sourceColumn: SCD_VALID_FROM
+
+		annotation SummarizationSetBy = Automatic
+
+	column SCD_VALID_TO
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: d32f72a7-0982-4eda-98bf-45b727a347a2
+		sourceLineageTag: SCD_VALID_TO
+		summarizeBy: none
+		sourceColumn: SCD_VALID_TO
+
+		annotation SummarizationSetBy = Automatic
+
+	column SCD_CURRENT_FLAG
+		dataType: string
+		sourceProviderType: varchar(1)
+		lineageTag: 8d07a7f5-c19f-472a-8871-05a51c1d1dff
+		sourceLineageTag: SCD_CURRENT_FLAG
+		summarizeBy: none
+		sourceColumn: SCD_CURRENT_FLAG
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Weather = entity
+		mode: directLake
+		source
+			entityName: DIM_WEATHER
+			schemaName: dbo
+			expressionSource: DatabaseQuery
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

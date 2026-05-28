@@ -1,0 +1,82 @@
+table Calendar
+	lineageTag: 8d2a1231-5589-468c-a225-75c0e4b614f5
+	sourceLineageTag: [dbo].[DIM_DATE]
+
+	column dim_date_id
+		dataType: string
+		sourceProviderType: varchar(-1)
+		lineageTag: bf580d66-e7c2-4ed8-8495-5586604742cc
+		sourceLineageTag: dim_date_id
+		summarizeBy: none
+		sourceColumn: dim_date_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column date
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: date
+		lineageTag: c4d6288e-642e-4269-90e2-47c365c0c08f
+		sourceLineageTag: date
+		summarizeBy: none
+		sourceColumn: date
+
+		annotation SummarizationSetBy = Automatic
+
+	column month
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 7e7691d3-b74c-40c0-a9a5-63cd8ee43a5d
+		sourceLineageTag: month
+		summarizeBy: none
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 9f102e5a-99d3-4166-8b8a-ed127a790e83
+		sourceLineageTag: year
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_name
+		dataType: string
+		sourceProviderType: varchar(-1)
+		lineageTag: 46dd497a-b34f-4a76-8620-70d2f990052b
+		sourceLineageTag: month_name
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: month
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 945cb98a-722e-4405-9285-505f5f5229d1
+		sourceLineageTag: quarter
+		summarizeBy: none
+		sourceColumn: quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Calendar = entity
+		mode: directLake
+		source
+			entityName: DIM_DATE
+			schemaName: dbo
+			expressionSource: DatabaseQuery
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

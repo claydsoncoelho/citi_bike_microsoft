@@ -1,0 +1,208 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "InvokePipeline",
+        "typeProperties": {
+          "parameters": {
+            "ExecutionId": {
+              "value": "@pipeline().RunId",
+              "type": "Expression"
+            }
+          },
+          "waitOnCompletion": true,
+          "workspaceId": "00000000-0000-0000-0000-000000000000",
+          "pipelineId": "abf6c5c9-ff3e-bd07-4585-2ad3c3efe5c7",
+          "operationType": "InvokeFabricPipeline"
+        },
+        "externalReferences": {
+          "connection": "03f7262b-553a-46eb-9560-b1ee7e472dde"
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Step_02_Snapshot",
+        "dependsOn": [
+          {
+            "activity": "LOG_Start_Process",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "InvokePipeline",
+        "typeProperties": {
+          "parameters": {
+            "ExecutionId": {
+              "value": "@pipeline().RunId",
+              "type": "Expression"
+            }
+          },
+          "waitOnCompletion": true,
+          "workspaceId": "00000000-0000-0000-0000-000000000000",
+          "pipelineId": "878af27e-ec06-ae77-4da7-245893a93ef4",
+          "operationType": "InvokeFabricPipeline"
+        },
+        "externalReferences": {
+          "connection": "03f7262b-553a-46eb-9560-b1ee7e472dde"
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Step_03_Load_Data_Mart",
+        "dependsOn": [
+          {
+            "activity": "Step_02_Snapshot",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SqlServerStoredProcedure",
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[SP_META_INSERT_EXECUTION_LOG]",
+          "storedProcedureParameters": {
+            "AdditionalContext": {
+              "value": null,
+              "type": "String"
+            },
+            "ExecutionId": {
+              "value": {
+                "value": "@pipeline().RunId",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineName": {
+              "value": {
+                "value": "@pipeline().PipelineName",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "StepName": {
+              "value": "ORCHESTRATION",
+              "type": "String"
+            },
+            "StepStatus": {
+              "value": "STARTED",
+              "type": "String"
+            }
+          }
+        },
+        "linkedService": {
+          "name": "5307e47f_92c1_4be9_8410_456d1d567da6",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+              "endpoint": "@pipeline().libraryVariables.VL_Global_wh_control_sql_endpoint",
+              "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "LOG_Start_Process",
+        "dependsOn": []
+      },
+      {
+        "type": "SqlServerStoredProcedure",
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[SP_META_INSERT_EXECUTION_LOG]",
+          "storedProcedureParameters": {
+            "AdditionalContext": {
+              "value": null,
+              "type": "String"
+            },
+            "ExecutionId": {
+              "value": {
+                "value": "@pipeline().RunId",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineName": {
+              "value": {
+                "value": "@pipeline().PipelineName",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "StepName": {
+              "value": "ORCHESTRATION",
+              "type": "String"
+            },
+            "StepStatus": {
+              "value": "FINISHED",
+              "type": "String"
+            }
+          }
+        },
+        "linkedService": {
+          "name": "5307e47f_92c1_4be9_8410_456d1d567da6",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+              "endpoint": "@pipeline().libraryVariables.VL_Global_wh_control_sql_endpoint",
+              "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "LOG_Finish_Process",
+        "dependsOn": [
+          {
+            "activity": "Step_03_Load_Data_Mart",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      }
+    ],
+    "libraryVariables": {
+      "VL_Global_workspace_id": {
+        "type": "String",
+        "variableName": "workspace_id",
+        "libraryName": "VL_Global"
+      },
+      "VL_Global_wh_control_id": {
+        "type": "String",
+        "variableName": "wh_control_id",
+        "libraryName": "VL_Global"
+      },
+      "VL_Global_wh_control_sql_endpoint": {
+        "type": "String",
+        "variableName": "sql_endpoint",
+        "libraryName": "VL_Global"
+      }
+    }
+  }
+}

@@ -1,0 +1,339 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "DataWarehouseSource",
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00"
+          },
+          "datasetSettings": {
+            "type": "DataWarehouseTable",
+            "typeProperties": {
+              "schema": "dbo",
+              "table": "meta_control_snapshot"
+            },
+            "schema": [],
+            "linkedService": {
+              "name": "87bc2f37_3f91_4772_95d4_d8cd4340f322",
+              "properties": {
+                "type": "DataWarehouse",
+                "typeProperties": {
+                  "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+                  "endpoint": "@pipeline().libraryVariables.VL_Global_wh_control_sql_endpoint",
+                  "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Lookup Control Table",
+        "dependsOn": [
+          {
+            "activity": "LOG_Stating_Pipeline",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "isSequential": false,
+          "batchCount": 2,
+          "items": {
+            "value": "@activity('Lookup Control Table').output.value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "TridentNotebook",
+              "typeProperties": {
+                "notebookId": "c80b8192-0887-b471-4ae5-d9cc8b6d3a68",
+                "workspaceId": "00000000-0000-0000-0000-000000000000",
+                "parameters": {
+                  "BRONZE_LAKEHOUSE_NAME": {
+                    "value": {
+                      "value": "@item().bronze_lakehouse_name",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "SOURCE_TABLE_NAME": {
+                    "value": {
+                      "value": "@item().source_table_name",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "KEY_COLUMNS": {
+                    "value": {
+                      "value": "@item().key_columns",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "SILVER_WAREHOUSE_NAME": {
+                    "value": {
+                      "value": "@item().silver_warehouse_name",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "TIMESTAMP_COLUMN_NAME": {
+                    "value": {
+                      "value": "@item().timestamp_column_name",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "EXTRACT_TIMESTAMP_FROM": {
+                    "value": {
+                      "value": "@item().extract_timestamp_from",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "EXTRACT_RANGE_IN_DAYS": {
+                    "value": {
+                      "value": "@item().extract_range_in_days",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  }
+                }
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Notebook bronze_snapshot",
+              "dependsOn": []
+            },
+            {
+              "type": "SqlServerStoredProcedure",
+              "typeProperties": {
+                "storedProcedureName": "[dbo].[SP_META_UPDATE_SNAPSHOT]",
+                "storedProcedureParameters": {
+                  "silver_warehouse_name": {
+                    "value": {
+                      "value": "@item().silver_warehouse_name",
+                      "type": "Expression"
+                    },
+                    "type": "String"
+                  },
+                  "source_table_name": {
+                    "value": {
+                      "value": "@item().source_table_name",
+                      "type": "Expression"
+                    },
+                    "type": "String"
+                  },
+                  "timestamp_column_name": {
+                    "value": {
+                      "value": "@item().timestamp_column_name",
+                      "type": "Expression"
+                    },
+                    "type": "String"
+                  }
+                }
+              },
+              "linkedService": {
+                "name": "39372159_b450_4dd5_8c28_59e3e307fd8f",
+                "properties": {
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+                    "endpoint": "@pipeline().libraryVariables.VL_Global_wh_control_sql_endpoint",
+                    "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+                  },
+                  "annotations": []
+                }
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Update snapshot control",
+              "dependsOn": [
+                {
+                  "activity": "Notebook bronze_snapshot",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "name": "ForEach Table Row",
+        "dependsOn": [
+          {
+            "activity": "Lookup Control Table",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SqlServerStoredProcedure",
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[SP_META_INSERT_EXECUTION_LOG]",
+          "storedProcedureParameters": {
+            "AdditionalContext": {
+              "value": null,
+              "type": "String"
+            },
+            "ExecutionId": {
+              "value": {
+                "value": "@pipeline().parameters.ExecutionId",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineName": {
+              "value": {
+                "value": "@pipeline().PipelineName",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "StepName": {
+              "value": "SNAPSHOT",
+              "type": "String"
+            },
+            "StepStatus": {
+              "value": "STARTED",
+              "type": "String"
+            }
+          }
+        },
+        "linkedService": {
+          "name": "39372159_b450_4dd5_8c28_59e3e307fd8f",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+              "endpoint": "@pipeline().libraryVariables.VL_Global_wh_control_sql_endpoint",
+              "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "LOG_Stating_Pipeline",
+        "dependsOn": []
+      },
+      {
+        "type": "SqlServerStoredProcedure",
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[SP_META_INSERT_EXECUTION_LOG]",
+          "storedProcedureParameters": {
+            "AdditionalContext": {
+              "value": null,
+              "type": "String"
+            },
+            "ExecutionId": {
+              "value": {
+                "value": "@pipeline().parameters.ExecutionId",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineName": {
+              "value": {
+                "value": "@pipeline().PipelineName",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "StepName": {
+              "value": "SNAPSHOT",
+              "type": "String"
+            },
+            "StepStatus": {
+              "value": "FINISHED",
+              "type": "String"
+            }
+          }
+        },
+        "linkedService": {
+          "name": "39372159_b450_4dd5_8c28_59e3e307fd8f",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+              "endpoint": "@pipeline().libraryVariables.VL_Global_wh_control_sql_endpoint",
+              "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "LOG_Finish_Pipeline",
+        "dependsOn": [
+          {
+            "activity": "ForEach Table Row",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      }
+    ],
+    "parameters": {
+      "ExecutionId": {
+        "type": "string"
+      }
+    },
+    "libraryVariables": {
+      "VL_Global_workspace_id": {
+        "type": "String",
+        "variableName": "workspace_id",
+        "libraryName": "VL_Global"
+      },
+      "VL_Global_wh_control_id": {
+        "type": "String",
+        "variableName": "wh_control_id",
+        "libraryName": "VL_Global"
+      },
+      "VL_Global_wh_control_sql_endpoint": {
+        "type": "String",
+        "variableName": "sql_endpoint",
+        "libraryName": "VL_Global"
+      }
+    }
+  }
+}

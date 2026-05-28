@@ -1,0 +1,229 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Script",
+        "typeProperties": {
+          "scripts": [
+            {
+              "text": {
+                "value": "TRUNCATE TABLE [WH_Control].[dbo].[meta_control_snapshot];\nINSERT INTO [WH_Control].[dbo].[meta_control_snapshot] (\n    bronze_lakehouse_name, silver_warehouse_name, source_table_name, key_columns, timestamp_column_name, \n    extract_timestamp_from, extract_range_in_days, is_active, last_updated_at\n)\nVALUES\n('LH_Bronze_Citi_Bike', 'WH_Silver_Citi_Bike', 'TRIPS', 'starttime,bikeid', 'starttime', '2019-01-01 00:00:00.000', 30, 1, GETDATE()),\n('LH_Bronze_Citi_Bike', 'WH_Silver_Citi_Bike', 'WEATHER_NYC', 'TIME_READABLE', 'TIME_READABLE', '2019-01-01 00:00:00.000', 730 , 1, GETDATE());",
+                "type": "Expression"
+              },
+              "type": "Query"
+            }
+          ],
+          "scriptBlockExecutionTimeout": "02:00:00"
+        },
+        "linkedService": {
+          "name": "94d7f987_3a2b_4052_b302_d634b4ed0ed4",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+              "endpoint": "@pipeline().libraryVariables.VL_Global_wh_control_sql_endpoint",
+              "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Insert snapshot data",
+        "dependsOn": [
+          {
+            "activity": "LOG_Start_Process",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SqlServerStoredProcedure",
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[SP_META_INSERT_EXECUTION_LOG]",
+          "storedProcedureParameters": {
+            "AdditionalContext": {
+              "value": null,
+              "type": "String"
+            },
+            "ExecutionId": {
+              "value": {
+                "value": "@pipeline().RunId",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineName": {
+              "value": {
+                "value": "@pipeline().PipelineName",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "StepName": {
+              "value": "DEPLOYMENT",
+              "type": "String"
+            },
+            "StepStatus": {
+              "value": "STARTED",
+              "type": "String"
+            }
+          }
+        },
+        "linkedService": {
+          "name": "197aeba2_579c_4667_8f03_a9b683c06e00",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+              "endpoint": "@pipeline().libraryVariables.VL_Global_wh_control_sql_endpoint",
+              "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "LOG_Start_Process",
+        "dependsOn": []
+      },
+      {
+        "type": "TridentNotebook",
+        "typeProperties": {
+          "notebookId": "8e20adc0-760b-9a2a-4dd6-36f82370fbad",
+          "workspaceId": "00000000-0000-0000-0000-000000000000",
+          "parameters": {
+            "BRONZE_LAKEHOUSE_NAME": {
+              "value": "LH_Bronze_Citi_Bike",
+              "type": "string"
+            },
+            "GOLD_WAREHOUSE_NAME": {
+              "value": "WH_Gold_Citi_Bike",
+              "type": "string"
+            },
+            "TABLE_NAME": {
+              "value": "DIM_DATE",
+              "type": "string"
+            },
+            "START_DATE": {
+              "value": "2018-01-01",
+              "type": "string"
+            },
+            "END_DATE": {
+              "value": "2020-01-31",
+              "type": "string"
+            }
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Load DIM_DATE",
+        "description": "Load DIM_DATE into Gold Warehouse",
+        "dependsOn": [
+          {
+            "activity": "Insert snapshot data",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SqlServerStoredProcedure",
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[SP_META_INSERT_EXECUTION_LOG]",
+          "storedProcedureParameters": {
+            "AdditionalContext": {
+              "value": null,
+              "type": "String"
+            },
+            "ExecutionId": {
+              "value": {
+                "value": "@pipeline().RunId",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineName": {
+              "value": {
+                "value": "@pipeline().PipelineName",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "StepName": {
+              "value": "DEPLOYMENT",
+              "type": "String"
+            },
+            "StepStatus": {
+              "value": "FINISHED",
+              "type": "String"
+            }
+          }
+        },
+        "linkedService": {
+          "name": "197aeba2_579c_4667_8f03_a9b683c06e00",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+              "endpoint": "@pipeline().libraryVariables.VL_Global_wh_control_sql_endpoint",
+              "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "LOG_Finished_Process",
+        "dependsOn": [
+          {
+            "activity": "Load DIM_DATE",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      }
+    ],
+    "libraryVariables": {
+      "VL_Global_workspace_id": {
+        "type": "String",
+        "variableName": "workspace_id",
+        "libraryName": "VL_Global"
+      },
+      "VL_Global_wh_control_id": {
+        "type": "String",
+        "variableName": "wh_control_id",
+        "libraryName": "VL_Global"
+      },
+      "VL_Global_wh_control_sql_endpoint": {
+        "type": "String",
+        "variableName": "sql_endpoint",
+        "libraryName": "VL_Global"
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Citi_Bike_Report_01"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "8619189c-a3f2-bc84-494d-2b86c46a0bc6"
+  }
+}

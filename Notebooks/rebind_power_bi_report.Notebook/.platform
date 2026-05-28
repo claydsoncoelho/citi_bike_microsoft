@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "util_rebind_power_bi_report"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "7b3eba4d-7757-8147-47f6-17862c0e7aec"
+  }
+}

@@ -1,0 +1,8 @@
+relationship 7e9792cb-565c-4752-0003-042a8d013a52
+	fromColumn: Trip.DIM_DATE_ID_TRIP
+	toColumn: Calendar.dim_date_id
+
+relationship 89a3f6da-746d-a1ea-9cef-e7106f33c695
+	fromColumn: Trip.SCD_DIM_WEATHER_ID
+	toColumn: Weather.SCD_DIM_WEATHER_ID
+

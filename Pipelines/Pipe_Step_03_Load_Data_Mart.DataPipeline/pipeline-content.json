@@ -1,0 +1,218 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "name": "SP_LOAD_DIM_WEATHER",
+        "type": "SqlServerStoredProcedure",
+        "dependsOn": [
+          {
+            "activity": "LOG_Stating_Pipeline",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[SP_LOAD_DIM_WEATHER]"
+        },
+        "linkedService": {
+          "name": "ea653fdd_10fb_4283_9f32_b80e81de2ac1",
+          "properties": {
+            "annotations": [],
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "endpoint": "@pipeline().libraryVariables.VL_Global_sql_endpoint",
+              "artifactId": "@pipeline().libraryVariables.VL_Global_wh_silver_citi_bike_id",
+              "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+            }
+          }
+        }
+      },
+      {
+        "name": "LOG_Stating_Pipeline",
+        "type": "SqlServerStoredProcedure",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[SP_META_INSERT_EXECUTION_LOG]",
+          "storedProcedureParameters": {
+            "AdditionalContext": {
+              "value": null,
+              "type": "String"
+            },
+            "ExecutionId": {
+              "value": {
+                "value": "@pipeline().parameters.ExecutionId",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineName": {
+              "value": {
+                "value": "@pipeline().PipelineName",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "StepName": {
+              "value": "LOAD_DATA_MART",
+              "type": "String"
+            },
+            "StepStatus": {
+              "value": "STARTED",
+              "type": "String"
+            }
+          }
+        },
+        "linkedService": {
+          "name": "1e4c37d7_f52d_4280_a075_fb34999134a6",
+          "properties": {
+            "annotations": [],
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "endpoint": "@pipeline().libraryVariables.VL_Global_sql_endpoint",
+              "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+              "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+            }
+          }
+        }
+      },
+      {
+        "name": "LOG_Finish_Pipeline",
+        "type": "SqlServerStoredProcedure",
+        "dependsOn": [
+          {
+            "activity": "SP_LOAD_FACT_TRIPS",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[SP_META_INSERT_EXECUTION_LOG]",
+          "storedProcedureParameters": {
+            "AdditionalContext": {
+              "value": null,
+              "type": "String"
+            },
+            "ExecutionId": {
+              "value": {
+                "value": "@pipeline().parameters.ExecutionId",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineName": {
+              "value": {
+                "value": "@pipeline().PipelineName",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "StepName": {
+              "value": "LOAD_DATA_MART",
+              "type": "String"
+            },
+            "StepStatus": {
+              "value": "FINISHED",
+              "type": "String"
+            }
+          }
+        },
+        "linkedService": {
+          "name": "1e4c37d7_f52d_4280_a075_fb34999134a6",
+          "properties": {
+            "annotations": [],
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "endpoint": "@pipeline().libraryVariables.VL_Global_sql_endpoint",
+              "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+              "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+            }
+          }
+        }
+      },
+      {
+        "name": "SP_LOAD_FACT_TRIPS",
+        "type": "SqlServerStoredProcedure",
+        "dependsOn": [
+          {
+            "activity": "SP_LOAD_DIM_WEATHER",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[SP_LOAD_FACT_TRIPS]"
+        },
+        "linkedService": {
+          "name": "ea653fdd_10fb_4283_9f32_b80e81de2ac1",
+          "properties": {
+            "annotations": [],
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "endpoint": "@pipeline().libraryVariables.VL_Global_sql_endpoint",
+              "artifactId": "@pipeline().libraryVariables.VL_Global_wh_silver_citi_bike_id",
+              "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "ExecutionId": {
+        "type": "string"
+      }
+    },
+    "libraryVariables": {
+      "VL_Global_workspace_id": {
+        "type": "String",
+        "variableName": "workspace_id",
+        "libraryName": "VL_Global"
+      },
+      "VL_Global_wh_control_id": {
+        "type": "String",
+        "variableName": "wh_control_id",
+        "libraryName": "VL_Global"
+      },
+      "VL_Global_sql_endpoint": {
+        "type": "String",
+        "variableName": "sql_endpoint",
+        "libraryName": "VL_Global"
+      },
+      "VL_Global_wh_silver_citi_bike_id": {
+        "type": "String",
+        "variableName": "wh_silver_citi_bike_id",
+        "libraryName": "VL_Global"
+      }
+    }
+  }
+}

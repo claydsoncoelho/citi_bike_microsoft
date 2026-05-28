@@ -1,0 +1,580 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "GetMetadata",
+        "typeProperties": {
+          "datasetSettings": {
+            "type": "Binary",
+            "typeProperties": {
+              "location": {
+                "type": "AzureBlobStorageLocation",
+                "container": "citi-bike",
+                "folderPath": "data"
+              }
+            },
+            "externalReferences": {
+              "connection": "8e029c64-f247-4607-84a4-5eb56da2a198"
+            },
+            "annotations": []
+          },
+          "fieldList": [
+            "childItems"
+          ],
+          "storeSettings": {
+            "type": "AzureBlobStorageReadSettings",
+            "recursive": true,
+            "enablePartitionDiscovery": false
+          },
+          "formatSettings": {
+            "type": "BinaryReadSettings"
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Get file list",
+        "dependsOn": [
+          {
+            "activity": "LOG_Stating_Pipeline",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "isSequential": true,
+          "items": {
+            "value": "@activity('Get file list').output.childItems",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "IfCondition",
+              "typeProperties": {
+                "expression": {
+                  "value": "@equals(variables('IsFileLoaded'), false)",
+                  "type": "Expression"
+                },
+                "ifTrueActivities": [
+                  {
+                    "type": "Lookup",
+                    "typeProperties": {
+                      "source": {
+                        "type": "DataWarehouseSource",
+                        "sqlReaderQuery": {
+                          "value": "DECLARE @FileName NVARCHAR(500) = '@{item().name}';\n\n-- Check if the table exists in the system metadata first\nIF OBJECT_ID('LH_Bronze_Citi_Bike.dbo.TRIPS', 'U') IS NOT NULL\nBEGIN\n    -- The table exists. Run the count using dynamic SQL to prevent compile-time errors.\n    DECLARE @SQL NVARCHAR(MAX) = N'SELECT COUNT(1) AS FileCount FROM LH_Bronze_Citi_Bike.dbo.TRIPS WHERE meta_filename = @File';\n    EXEC sp_executesql @SQL, N'@File NVARCHAR(500)', @File = @FileName;\nEND\nELSE\nBEGIN\n    -- First run scenario: The table doesn't exist yet, return a safe 0 count.\n    SELECT 0 AS FileCount;\nEND",
+                          "type": "Expression"
+                        },
+                        "partitionOption": "None",
+                        "queryTimeout": "02:00:00"
+                      },
+                      "datasetSettings": {
+                        "type": "DataWarehouseTable",
+                        "schema": [],
+                        "linkedService": {
+                          "name": "e339dcfd_e1fc_4ca2_b26d_abfbf0fad733",
+                          "properties": {
+                            "type": "DataWarehouse",
+                            "typeProperties": {
+                              "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+                              "endpoint": "@pipeline().libraryVariables.VL_Global_wh_control_sql_endpoint",
+                              "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+                            },
+                            "annotations": []
+                          }
+                        },
+                        "annotations": []
+                      },
+                      "firstRowOnly": true
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "check_if_file_was_loaded",
+                    "dependsOn": []
+                  },
+                  {
+                    "type": "SetVariable",
+                    "typeProperties": {
+                      "variableName": "FileCount",
+                      "value": {
+                        "value": "@activity('check_if_file_was_loaded').output.firstRow.FileCount",
+                        "type": "Expression"
+                      }
+                    },
+                    "policy": {
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "set_FileCount_value",
+                    "dependsOn": [
+                      {
+                        "activity": "check_if_file_was_loaded",
+                        "dependencyConditions": [
+                          "Succeeded"
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "ifFalseActivities": [
+                  {
+                    "type": "SetVariable",
+                    "typeProperties": {
+                      "variableName": "FileCount",
+                      "value": 9
+                    },
+                    "policy": {
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "set_FileCount_9",
+                    "dependsOn": []
+                  }
+                ]
+              },
+              "name": "If file any file not loaded yet",
+              "dependsOn": []
+            },
+            {
+              "type": "IfCondition",
+              "typeProperties": {
+                "expression": {
+                  "value": "@equals(variables('FileCount'), 0)",
+                  "type": "Expression"
+                },
+                "ifTrueActivities": [
+                  {
+                    "type": "Copy",
+                    "typeProperties": {
+                      "source": {
+                        "type": "DelimitedTextSource",
+                        "formatSettings": {
+                          "type": "DelimitedTextReadSettings"
+                        },
+                        "additionalColumns": [
+                          {
+                            "name": "meta_filename",
+                            "value": "$$FILENAME"
+                          }
+                        ],
+                        "storeSettings": {
+                          "type": "AzureBlobStorageReadSettings",
+                          "recursive": true,
+                          "enablePartitionDiscovery": false
+                        },
+                        "datasetSettings": {
+                          "type": "DelimitedText",
+                          "typeProperties": {
+                            "location": {
+                              "type": "AzureBlobStorageLocation",
+                              "container": "citi-bike",
+                              "folderPath": "data",
+                              "fileName": {
+                                "value": "@{item().name}",
+                                "type": "Expression"
+                              }
+                            },
+                            "columnDelimiter": ",",
+                            "quoteChar": "\"",
+                            "escapeChar": "\\",
+                            "firstRowAsHeader": true
+                          },
+                          "schema": [],
+                          "externalReferences": {
+                            "connection": "8e029c64-f247-4607-84a4-5eb56da2a198"
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "sink": {
+                        "type": "LakehouseTableSink",
+                        "tableActionOption": "Upsert",
+                        "applyVOrder": false,
+                        "upsertSettings": {
+                          "keys": [
+                            "starttime",
+                            "bikeid"
+                          ]
+                        },
+                        "partitionOption": "None",
+                        "datasetSettings": {
+                          "type": "LakehouseTable",
+                          "typeProperties": {
+                            "table": "TRIPS"
+                          },
+                          "schema": [],
+                          "linkedService": {
+                            "name": "LH_Bronze_Citi_Bike",
+                            "properties": {
+                              "type": "Lakehouse",
+                              "typeProperties": {
+                                "artifactId": "4822f54d-5b3a-98e7-4a34-0e0c5fd1ee47",
+                                "workspaceId": "00000000-0000-0000-0000-000000000000",
+                                "rootFolder": "Tables"
+                              },
+                              "annotations": []
+                            }
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "translator": {
+                        "type": "TabularTranslator",
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                          "allowDataTruncation": true,
+                          "treatBooleanAsNumber": false
+                        }
+                      },
+                      "enableStaging": false
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "Copy_Trips",
+                    "dependsOn": [
+                      {
+                        "activity": "LOG_Stating_Pipeline_Load",
+                        "dependencyConditions": [
+                          "Succeeded"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "SetVariable",
+                    "typeProperties": {
+                      "variableName": "IsFileLoaded",
+                      "value": true
+                    },
+                    "policy": {
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "set_IsFileLoaded_true",
+                    "dependsOn": [
+                      {
+                        "activity": "Copy_Trips",
+                        "dependencyConditions": [
+                          "Succeeded"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "SqlServerStoredProcedure",
+                    "typeProperties": {
+                      "storedProcedureName": "[dbo].[SP_META_INSERT_EXECUTION_LOG]",
+                      "storedProcedureParameters": {
+                        "AdditionalContext": {
+                          "value": {
+                            "value": "@concat('Loading ', item().name)",
+                            "type": "Expression"
+                          },
+                          "type": "String"
+                        },
+                        "ExecutionId": {
+                          "value": {
+                            "value": "@pipeline().parameters.ExecutionId",
+                            "type": "Expression"
+                          },
+                          "type": "String"
+                        },
+                        "PipelineName": {
+                          "value": {
+                            "value": "@pipeline().PipelineName",
+                            "type": "Expression"
+                          },
+                          "type": "String"
+                        },
+                        "StepName": {
+                          "value": "INGESTION_TRIPS",
+                          "type": "String"
+                        },
+                        "StepStatus": {
+                          "value": "LOADING",
+                          "type": "String"
+                        }
+                      }
+                    },
+                    "linkedService": {
+                      "name": "585cba53_0281_407f_b237_4e2535c0378a",
+                      "properties": {
+                        "type": "DataWarehouse",
+                        "typeProperties": {
+                          "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+                          "endpoint": "@pipeline().libraryVariables.VL_Global_wh_control_sql_endpoint",
+                          "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "LOG_Stating_Pipeline_Load",
+                    "dependsOn": []
+                  },
+                  {
+                    "type": "SqlServerStoredProcedure",
+                    "typeProperties": {
+                      "storedProcedureName": "[dbo].[SP_META_INSERT_EXECUTION_LOG]",
+                      "storedProcedureParameters": {
+                        "AdditionalContext": {
+                          "value": {
+                            "value": "@concat(item().name, ' loaded.')",
+                            "type": "Expression"
+                          },
+                          "type": "String"
+                        },
+                        "ExecutionId": {
+                          "value": {
+                            "value": "@pipeline().parameters.ExecutionId",
+                            "type": "Expression"
+                          },
+                          "type": "String"
+                        },
+                        "PipelineName": {
+                          "value": {
+                            "value": "@pipeline().PipelineName",
+                            "type": "Expression"
+                          },
+                          "type": "String"
+                        },
+                        "StepName": {
+                          "value": "INGESTION_TRIPS",
+                          "type": "String"
+                        },
+                        "StepStatus": {
+                          "value": "LOADED",
+                          "type": "String"
+                        }
+                      }
+                    },
+                    "linkedService": {
+                      "name": "585cba53_0281_407f_b237_4e2535c0378a",
+                      "properties": {
+                        "type": "DataWarehouse",
+                        "typeProperties": {
+                          "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+                          "endpoint": "@pipeline().libraryVariables.VL_Global_wh_control_sql_endpoint",
+                          "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "LOG_Finish_Pipeline_Load",
+                    "dependsOn": [
+                      {
+                        "activity": "set_IsFileLoaded_true",
+                        "dependencyConditions": [
+                          "Succeeded"
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "ifFalseActivities": []
+              },
+              "name": "if_FileCount_0",
+              "dependsOn": [
+                {
+                  "activity": "If file any file not loaded yet",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "name": "ForEach file",
+        "dependsOn": [
+          {
+            "activity": "Get file list",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SqlServerStoredProcedure",
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[SP_META_INSERT_EXECUTION_LOG]",
+          "storedProcedureParameters": {
+            "AdditionalContext": {
+              "value": null,
+              "type": "String"
+            },
+            "ExecutionId": {
+              "value": {
+                "value": "@pipeline().parameters.ExecutionId",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineName": {
+              "value": {
+                "value": "@pipeline().PipelineName",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "StepName": {
+              "value": "INGESTION_TRIPS",
+              "type": "String"
+            },
+            "StepStatus": {
+              "value": "STARTED",
+              "type": "String"
+            }
+          }
+        },
+        "linkedService": {
+          "name": "ad2ad932_3496_4512_b4b8_e4456a06a0db",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+              "endpoint": "@pipeline().libraryVariables.VL_Global_wh_control_sql_endpoint",
+              "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "LOG_Stating_Pipeline",
+        "dependsOn": []
+      },
+      {
+        "type": "SqlServerStoredProcedure",
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[SP_META_INSERT_EXECUTION_LOG]",
+          "storedProcedureParameters": {
+            "AdditionalContext": {
+              "value": null,
+              "type": "String"
+            },
+            "ExecutionId": {
+              "value": {
+                "value": "@pipeline().parameters.ExecutionId",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineName": {
+              "value": {
+                "value": "@pipeline().PipelineName",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "StepName": {
+              "value": "INGESTION_TRIPS",
+              "type": "String"
+            },
+            "StepStatus": {
+              "value": "FINISHED",
+              "type": "String"
+            }
+          }
+        },
+        "linkedService": {
+          "name": "ad2ad932_3496_4512_b4b8_e4456a06a0db",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "@pipeline().libraryVariables.VL_Global_wh_control_id",
+              "endpoint": "@pipeline().libraryVariables.VL_Global_wh_control_sql_endpoint",
+              "workspaceId": "@pipeline().libraryVariables.VL_Global_workspace_id"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "LOG_Finish_Pipeline",
+        "dependsOn": [
+          {
+            "activity": "ForEach file",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      }
+    ],
+    "parameters": {
+      "ExecutionId": {
+        "type": "string"
+      }
+    },
+    "libraryVariables": {
+      "VL_Global_workspace_id": {
+        "type": "String",
+        "variableName": "workspace_id",
+        "libraryName": "VL_Global"
+      },
+      "VL_Global_wh_control_id": {
+        "type": "String",
+        "variableName": "wh_control_id",
+        "libraryName": "VL_Global"
+      },
+      "VL_Global_wh_control_sql_endpoint": {
+        "type": "String",
+        "variableName": "sql_endpoint",
+        "libraryName": "VL_Global"
+      }
+    },
+    "variables": {
+      "IsFileLoaded": {
+        "type": "Boolean",
+        "defaultValue": false
+      },
+      "FileCount": {
+        "type": "Integer",
+        "defaultValue": 9
+      }
+    }
+  }
+}

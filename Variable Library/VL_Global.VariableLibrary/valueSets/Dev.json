@@ -1,0 +1,22 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/variableLibrary/definition/valueSet/1.0.0/schema.json",
+  "name": "Dev",
+  "variableOverrides": [
+    {
+      "name": "workspace_id",
+      "value": "f91c3786-cc5f-4a68-b38d-22848019e45b"
+    },
+    {
+      "name": "wh_control_id",
+      "value": "f05fa2de-9a89-4d33-a309-aa3983b78a02"
+    },
+    {
+      "name": "sql_endpoint",
+      "value": "32ebfjmbw6zuhftgkc2b6qekfm-qy3rz6k7zruevm4nekciagpelm.datawarehouse.fabric.microsoft.com"
+    },
+    {
+      "name": "wh_silver_citi_bike_id",
+      "value": "27b53b61-8591-4139-a1e8-2f41b4d32a72"
+    }
+  ]
+}

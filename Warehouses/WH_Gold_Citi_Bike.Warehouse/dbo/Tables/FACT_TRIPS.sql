@@ -1,0 +1,14 @@
+CREATE TABLE [dbo].[FACT_TRIPS] (
+
+	[TRIP_COUNT] int NULL, 
+	[DIM_DATE_ID_TRIP] varchar(255) NULL, 
+	[MAX_START_TIME] datetime2(3) NULL, 
+	[SCD_DIM_WEATHER_ID] varchar(255) NULL, 
+	[TRIP_DURATION_MIN_RANGE] varchar(255) NULL, 
+	[PERIOD_OF_DAY] varchar(255) NULL, 
+	[TRIP_DISTANCE_RANGE] varchar(255) NULL, 
+	[TRIP_DISTANCE_SUM_KM] float NULL, 
+	[USER_TYPE] varchar(255) NULL, 
+	[AGE_RANGE] varchar(255) NULL, 
+	[GENDER] varchar(255) NULL
+);

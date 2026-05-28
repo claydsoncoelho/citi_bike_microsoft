@@ -1,0 +1,129 @@
+table Trip
+	lineageTag: 8dcccc21-6602-46ca-b250-cfea60295205
+	sourceLineageTag: [dbo].[FACT_TRIPS]
+
+	column TRIP_COUNT
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: f3cce2b0-fc9b-4aca-b794-936c4ea88bc4
+		sourceLineageTag: TRIP_COUNT
+		summarizeBy: sum
+		sourceColumn: TRIP_COUNT
+
+		annotation SummarizationSetBy = Automatic
+
+	column DIM_DATE_ID_TRIP
+		dataType: string
+		sourceProviderType: varchar(255)
+		lineageTag: 31212f81-a67c-4616-bd61-8a994c4db091
+		sourceLineageTag: DIM_DATE_ID_TRIP
+		summarizeBy: none
+		sourceColumn: DIM_DATE_ID_TRIP
+
+		annotation SummarizationSetBy = Automatic
+
+	column MAX_START_TIME
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: 8c4a0194-d35d-474b-91cc-f11f813f380d
+		sourceLineageTag: MAX_START_TIME
+		summarizeBy: none
+		sourceColumn: MAX_START_TIME
+
+		annotation SummarizationSetBy = Automatic
+
+	column SCD_DIM_WEATHER_ID
+		dataType: string
+		sourceProviderType: varchar(255)
+		lineageTag: dbf6c3a9-4f0b-439b-b717-b4cc2a4e35ca
+		sourceLineageTag: SCD_DIM_WEATHER_ID
+		summarizeBy: none
+		sourceColumn: SCD_DIM_WEATHER_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column TRIP_DURATION_MIN_RANGE
+		dataType: string
+		sourceProviderType: varchar(255)
+		lineageTag: 28c0550d-2da8-4327-90a7-07f52212c507
+		sourceLineageTag: TRIP_DURATION_MIN_RANGE
+		summarizeBy: none
+		sourceColumn: TRIP_DURATION_MIN_RANGE
+
+		annotation SummarizationSetBy = Automatic
+
+	column PERIOD_OF_DAY
+		dataType: string
+		sourceProviderType: varchar(255)
+		lineageTag: 13c3cf85-c74c-4851-b3c2-a32de26f4864
+		sourceLineageTag: PERIOD_OF_DAY
+		summarizeBy: none
+		sourceColumn: PERIOD_OF_DAY
+
+		annotation SummarizationSetBy = Automatic
+
+	column TRIP_DISTANCE_RANGE
+		dataType: string
+		sourceProviderType: varchar(255)
+		lineageTag: 6ca56d6d-f2d0-4b87-95d7-0576f11d5ca4
+		sourceLineageTag: TRIP_DISTANCE_RANGE
+		summarizeBy: none
+		sourceColumn: TRIP_DISTANCE_RANGE
+
+		annotation SummarizationSetBy = Automatic
+
+	column TRIP_DISTANCE_SUM_KM
+		dataType: double
+		sourceProviderType: float
+		lineageTag: e3d470ae-872d-4c74-94c8-ba25dd7838b1
+		sourceLineageTag: TRIP_DISTANCE_SUM_KM
+		summarizeBy: sum
+		sourceColumn: TRIP_DISTANCE_SUM_KM
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column USER_TYPE
+		dataType: string
+		sourceProviderType: varchar(255)
+		lineageTag: 3fbc0705-34c9-43fd-adcf-76a1c7c7386b
+		sourceLineageTag: USER_TYPE
+		summarizeBy: none
+		sourceColumn: USER_TYPE
+
+		annotation SummarizationSetBy = Automatic
+
+	column AGE_RANGE
+		dataType: string
+		sourceProviderType: varchar(255)
+		lineageTag: 53414ac8-68a4-42c1-b26f-d62735ae61ee
+		sourceLineageTag: AGE_RANGE
+		summarizeBy: none
+		sourceColumn: AGE_RANGE
+
+		annotation SummarizationSetBy = Automatic
+
+	column GENDER
+		dataType: string
+		sourceProviderType: varchar(255)
+		lineageTag: 650f5362-c1d3-473f-921b-20e40d54ebd7
+		sourceLineageTag: GENDER
+		summarizeBy: none
+		sourceColumn: GENDER
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Trip = entity
+		mode: directLake
+		source
+			entityName: FACT_TRIPS
+			schemaName: dbo
+			expressionSource: DatabaseQuery
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

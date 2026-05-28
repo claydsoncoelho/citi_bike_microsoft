@@ -1,0 +1,25 @@
+CREATE TABLE [dbo].[WEATHER_NYC_SNAPSHOT] (
+
+	[SCD_KEY] varchar(255) NULL, 
+	[TIME_READABLE] varchar(255) NULL, 
+	[CITY_NAME] varchar(255) NULL, 
+	[COUNTRY] varchar(255) NULL, 
+	[CITY_ID] varchar(255) NULL, 
+	[CITY_FINDNAME] varchar(255) NULL, 
+	[CITY_LATITUDE] varchar(255) NULL, 
+	[CITY_LONGITUDE] varchar(255) NULL, 
+	[CITY_LOCATION] varchar(255) NULL, 
+	[WEATHER_DESCRIPTION] varchar(255) NULL, 
+	[WEATHER_MAIN] varchar(255) NULL, 
+	[TEMPERATURE] varchar(255) NULL, 
+	[HUMIDITY] varchar(255) NULL, 
+	[PRESSURE] varchar(255) NULL, 
+	[WIND_SPEED] varchar(255) NULL, 
+	[WIND_DEG] varchar(255) NULL, 
+	[METADATA_FILENAME] varchar(255) NULL, 
+	[METADATA_FILE_ROW_NUMBER] varchar(255) NULL, 
+	[METADATA_FILE_LAST_MODIFIED] varchar(255) NULL, 
+	[SCD_START_TIMESTAMP] datetime2(3) NULL, 
+	[SCD_END_TIMESTAMP] datetime2(3) NULL, 
+	[SCD_IS_CURRENT] bit NULL
+);

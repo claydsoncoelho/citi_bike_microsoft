@@ -1,0 +1,26 @@
+CREATE TABLE [dbo].[DIM_WEATHER] (
+
+	[SCD_DIM_WEATHER_ID] varchar(255) NULL, 
+	[DATE_READABLE] date NULL, 
+	[TIME_READABLE] datetime2(3) NULL, 
+	[COUNTRY] varchar(50) NULL, 
+	[CITY_NAME] varchar(255) NULL, 
+	[WEATHER_MAIN] varchar(100) NULL, 
+	[WEATHER_DETAIL] varchar(255) NULL, 
+	[TEMPERATURE_CELSIUS] float NULL, 
+	[HUMIDITY] int NULL, 
+	[WIND_SPEED] float NULL, 
+	[CITY_LATITUDE] decimal(9,6) NULL, 
+	[CITY_LAT_BUCKET] int NULL, 
+	[CITY_LONGITUDE] decimal(9,6) NULL, 
+	[CITY_LON_BUCKET] int NULL, 
+	[CITY_LOCATION] varchar(255) NULL, 
+	[TEMPERATURE_KELVIN] float NULL, 
+	[PRESSURE] float NULL, 
+	[WIND_DEG] float NULL, 
+	[CITY_ID] int NULL, 
+	[CITY_FINDNAME] varchar(255) NULL, 
+	[SCD_VALID_FROM] datetime2(3) NULL, 
+	[SCD_VALID_TO] datetime2(3) NULL, 
+	[SCD_CURRENT_FLAG] varchar(1) NULL
+);

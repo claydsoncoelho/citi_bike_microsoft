@@ -1,0 +1,32 @@
+table _Measures
+	lineageTag: eb7c48e5-b21c-4f3d-9749-684fff53a21f
+
+	measure 'Total Distance Traveled (Km)' = SUM(Trip[TRIP_DISTANCE_SUM_KM])
+		lineageTag: 1cfd57de-d597-436d-9042-46eb95dc3b4e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Trips' = SUM(Trip[TRIP_COUNT])
+		formatString: 0
+		lineageTag: d031e8f1-3302-43aa-bb6e-700c6a196abb
+
+	measure 'Round trips to the moon' = QUOTIENT([Total Distance Traveled (Km)], (384400 * 2))
+		formatString: 0
+		lineageTag: 15480ec8-6496-442a-abd5-8e369b944213
+
+	column dummy
+		isHidden
+		formatString: 0
+		lineageTag: 587fc000-113c-442f-97df-c346fff0d0fe
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [dummy]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = calculated
+		mode: import
+		source = ROW("dummy",1)
+
+	annotation PBI_Id = 66b7e6bbdfc24c5e92e8b7619eb6d700
+
